@@ -72,13 +72,12 @@ readonly ruby_urls=(
 
 # Follow the XDG Base Directory Specification
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-readonly data_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/keybelt"
-readonly runtime_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/keybelt"
-readonly config_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/keybelt"
-readonly ruby_parent_dir="${data_dir}/portable-ruby"
-readonly ruby_dir="${ruby_parent_dir}/${ruby_version}"
+readonly data_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/portable-ruby"
+readonly describe_data_dir='${XDG_DATA_HOME:-${HOME}/.local/share}/portable-ruby'
+readonly runtime_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/portable-ruby"
+readonly ruby_dir="${data_dir}/${ruby_version}"
 readonly temp_path="${runtime_dir}/${ruby_filename}.incomplete"
-readonly ruby_tarball="${ruby_parent_dir}/${ruby_filename}"
+readonly ruby_tarball="${data_dir}/${ruby_filename}"
 
 # Returns true if the command $1 exists.
 has() {
@@ -185,11 +184,10 @@ readonly trap_script
 trap "${trap_script}" EXIT
 
 # Ensure the tmp directory is there.
-mkdir -p "${runtime_dir}" "${ruby_parent_dir}"
+mkdir -p "${runtime_dir}" "${data_dir}"
 
 # Skip downloading if it is already here.
 if ! validate-sha "${ruby_tarball}" "${ruby_sha}"; then
-  info "Downloading Portable Ruby."
 
   # Try several URLs
   for url in "${ruby_urls[@]}"; do
@@ -220,10 +218,15 @@ tar \
 # Link 'current' to the version directory.
 ln -nsf \
   "${ruby_dir}" \
-  "${ruby_parent_dir}/current"
+  "${data_dir}/current"
 
-printf "Portable Ruby %s is now available at %s\n" \
-  "${ruby_version}" \
-  "${ruby_parent_dir}/current/bin/ruby"
+# TODO: when installed with a specific version, show that instead of 'current'.
+printf 'Portable Ruby %s is ready!\n' "${ruby_version}"
+printf '\n'
+printf 'To use the portable Ruby, add it to your PATH:\n'
+# shellcheck disable=SC2016
+printf '  export PATH="%s/current/bin:$PATH"\n' "${describe_data_dir}"
+printf 'or use the absolute path:\n'
+printf '  %s/bin/ruby\n' "${data_dir}/current/bin"
 
 # EOF
