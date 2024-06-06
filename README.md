@@ -5,7 +5,7 @@
 ## Usage
 
 ```console
-curl -sSfL --url 'https://githubusercontent.com/docwhat/portable-ruby-installer/main/install.bash | bash
+curl -sSfL --url 'https://raw.githubusercontent.com/docwhat/portable-ruby-installer/main/install.bash' | bash
 ```
 
 ## Requirements
